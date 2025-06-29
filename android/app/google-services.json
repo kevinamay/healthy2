@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "907538546027",
+    "project_id": "kesehatan-1dbad",
+    "storage_bucket": "kesehatan-1dbad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907538546027:android:2962ab6842edb9c47fa02e",
+        "android_client_info": {
+          "package_name": "com.example.hitung"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwU7Et0GrgbGMpfsBNEcjssAZwE0ySKNc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hitung/screens/login_screen.dart';
-import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah semua cabang
-
-// --- TAMBAHKAN IMPORT INI ---
+import 'package:hitung/screens/next_page_after_goal.dart';
 import 'package:hitung/screens/sub_goals/weight_loss_obstacle_screen.dart';
 import 'package:hitung/screens/sub_goals/metabolism_improvement_screen.dart';
 import 'package:hitung/screens/sub_goals/energy_level_screen.dart';
 import 'package:hitung/screens/sub_goals/anti_aging_aspect_screen.dart';
 import 'package:hitung/screens/sub_goals/weight_maintenance_challenge_screen.dart';
 import 'package:hitung/screens/sub_goals/mental_health_aspect_screen.dart';
-// --- AKHIR TAMBAHAN IMPORT ---
 
 
 class GoalSelectionScreen extends StatefulWidget {
@@ -22,13 +19,11 @@ class GoalSelectionScreen extends StatefulWidget {
 }
 
 class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
-  String? _selectedGoal; // Variabel untuk menyimpan tujuan yang dipilih
+  String? _selectedGoal;
 
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Daftar tujuan kesehatan
-  // --- GANTI BAGIAN _goals INI ---
   final List<Map<String, dynamic>> _goals = [
     {
       'title': 'Menurunkan berat badan',
@@ -36,7 +31,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
       'icon': Icons.scale,
       'iconColor': Colors.pink.shade300,
       'valueToSave': 'Menurunkan berat badan',
-      'nextPage': const WeightLossObstacleScreen(), // <-- DITAMBAHKAN
+      'nextPage': const WeightLossObstacleScreen(),
     },
     {
       'title': 'Meningkatkan kesehatan metabolisme',
@@ -44,7 +39,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
       'icon': Icons.cached,
       'iconColor': Colors.orange.shade300,
       'valueToSave': 'Meningkatkan kesehatan metabolisme',
-      'nextPage': const MetabolismImprovementScreen(), // <-- DITAMBAHKAN
+      'nextPage': const MetabolismImprovementScreen(),
     },
     {
       'title': 'Dapatkan energi',
@@ -52,7 +47,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
       'icon': Icons.flash_on,
       'iconColor': Colors.amber.shade300,
       'valueToSave': 'Dapatkan energi',
-      'nextPage': const EnergyLevelScreen(), // <-- DITAMBAHKAN
+      'nextPage': const EnergyLevelScreen(),
     },
     {
       'title': 'Anti-penuaan dan umur panjang',
@@ -60,7 +55,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
       'icon': Icons.star_border,
       'iconColor': Colors.lightGreen.shade300,
       'valueToSave': 'Anti-penuaan dan umur panjang',
-      'nextPage': const AntiAgingAspectScreen(), // <-- DITAMBAHKAN
+      'nextPage': const AntiAgingAspectScreen(),
     },
     {
       'title': 'Mempertahankan berat badan',
@@ -68,7 +63,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
       'icon': Icons.loop,
       'iconColor': Colors.blue.shade300,
       'valueToSave': 'Mempertahankan berat badan',
-      'nextPage': const WeightMaintenanceChallengeScreen(), // <-- DITAMBAHKAN
+      'nextPage': const WeightMaintenanceChallengeScreen(),
     },
     {
       'title': 'Meningkatkan kesehatan mental',
@@ -76,10 +71,9 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
       'icon': Icons.lightbulb_outline,
       'iconColor': Colors.deepPurple.shade300,
       'valueToSave': 'Meningkatkan kesehatan mental',
-      'nextPage': const MentalHealthAspectScreen(), // <-- DITAMBAHKAN
+      'nextPage': const MentalHealthAspectScreen(),
     },
   ];
-  // --- AKHIR GANTI BAGIAN _goals ---
 
   Future<void> _saveGoalAndNavigate() async {
     print('DEBUG: GoalSelectionScreen - _saveGoalAndNavigate called.');
@@ -116,7 +110,6 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
         const SnackBar(content: Text('Tujuan Anda berhasil disimpan!')),
       );
 
-      // --- TAMBAHKAN LOGIKA NAVIGASI KONDISIONAL INI ---
       Widget? nextPageWidget;
       for (var goal in _goals) {
         if (goal['valueToSave'] == _selectedGoal) {
@@ -132,14 +125,12 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
           MaterialPageRoute(builder: (context) => nextPageWidget!),
         );
       } else {
-        // Fallback jika nextPageWidget tidak ditemukan (harusnya tidak terjadi jika logika benar)
         print('DEBUG: GoalSelectionScreen - No specific next page found. Navigating to default.');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const NextPageAfterGoal()),
         );
       }
-      // --- AKHIR TAMBAHAN LOGIKA NAVIGASI KONDISIONAL ---
 
     } on FirebaseException catch (e) {
       print('DEBUG: GoalSelectionScreen - Firebase Exception: ${e.code} - ${e.message}');
@@ -154,6 +145,26 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
     }
   }
 
+  // Fungsi Logout
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Berhasil logout.')),
+      );
+      Navigator.pushAndRemoveUntil( // Kembali ke LoginScreen dan hapus semua rute sebelumnya
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print('Error during logout: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal logout: ${e.toString()}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,6 +172,15 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
         title: const Text('Apa tujuan Anda?'),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        // --- TAMBAHKAN TOMBOL LOGOUT INI ---
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
+        // --- AKHIR TAMBAHAN TOMBOL LOGOUT ---
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

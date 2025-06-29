@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hitung/screens/login_screen.dart'; // Untuk navigasi fallback
+import 'package:hitung/screens/login_screen.dart';
+import 'package:hitung/screens/goal_selection_screen.dart'; // Import GoalSelectionScreen untuk tombol Back
 
 // Define a callback function type for when a selection is made and to save data
 typedef OnSelectionMadeCallback = Future<void> Function(String selectedOption);
@@ -70,15 +71,13 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
       );
 
       if (widget.nextScreen != null) {
-        print('DEBUG: ${widget.screenDescription} - Navigating to next screen.');
+        print('DEBUG: ${widget.screenDescription} - Navigating to ${widget.nextScreen!.runtimeType}');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => widget.nextScreen!),
         );
       } else {
         print('DEBUG: ${widget.screenDescription} - No next screen specified, staying on current page.');
-        // If there's no next screen, perhaps show a success message or go to a default dashboard.
-        // For now, we'll just show the success snackbar and stay.
       }
     } on FirebaseException catch (e) {
       print('DEBUG: ${widget.screenDescription} - Firebase Exception: ${e.code} - ${e.message}');
@@ -93,6 +92,26 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
     }
   }
 
+  // Fungsi Logout
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Berhasil logout.')),
+      );
+      Navigator.pushAndRemoveUntil( // Kembali ke LoginScreen dan hapus semua rute sebelumnya
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print('Error during logout: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal logout: ${e.toString()}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,6 +119,15 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
         title: Text(widget.title),
         centerTitle: true,
         automaticallyImplyLeading: false, // Menghilangkan tombol back default
+        // --- TAMBAHKAN TOMBOL LOGOUT INI ---
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
+        // --- AKHIR TAMBAHAN TOMBOL LOGOUT ---
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -145,13 +173,13 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: option['iconColor'].withOpacity(0.2),
+                                color: (option['iconColor'] as Color).withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                option['icon'],
+                                option['icon'] as IconData,
                                 size: 30,
-                                color: option['iconColor'],
+                                color: option['iconColor'] as Color,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -160,7 +188,7 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    option['title'],
+                                    option['title'] as String,
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -169,7 +197,7 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    option['subtitle'],
+                                    option['subtitle'] as String,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey[600],
@@ -200,6 +228,20 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
                 child: const Text('BERIKUTNYA'),
               ),
             ),
+            // --- TAMBAHKAN TOMBOL BACK INI ---
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.pushReplacement( // Mengganti halaman saat ini
+                    context,
+                    MaterialPageRoute(builder: (context) => const GoalSelectionScreen()),
+                  );
+                },
+                child: const Text('KEMBALI'),
+              ),
+            ),
+            // --- AKHIR TAMBAHAN TOMBOL BACK ---
           ],
         ),
       ),

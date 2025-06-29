@@ -54,8 +54,12 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
         const SnackBar(content: Text('Pengguna tidak ditemukan. Harap login kembali.')),
       );
       print('DEBUG: ${widget.screenDescription} - User is null, redirecting to login.');
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      // Menggunakan pushAndRemoveUntil untuk memastikan tidak ada history kembali setelah logout
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+          (Route<dynamic> route) => false,
+      );
       return;
     }
 
@@ -118,8 +122,7 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
-        automaticallyImplyLeading: false, // Menghilangkan tombol back default
-        // --- TAMBAHKAN TOMBOL LOGOUT INI ---
+        automaticallyImplyLeading: false, // Menghilangkan tombol back default dari AppBar
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -127,7 +130,6 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
             tooltip: 'Logout',
           ),
         ],
-        // --- AKHIR TAMBAHAN TOMBOL LOGOUT ---
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -228,23 +230,43 @@ class _BaseQuestionScreenState extends State<BaseQuestionScreen> {
                 child: const Text('BERIKUTNYA'),
               ),
             ),
-            // --- TAMBAHKAN TOMBOL BACK INI ---
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.pushReplacement( // Mengganti halaman saat ini
-                    context,
-                    MaterialPageRoute(builder: (context) => const GoalSelectionScreen()),
-                  );
-                },
-                child: const Text('KEMBALI'),
-              ),
-            ),
-            // --- AKHIR TAMBAHAN TOMBOL BACK ---
+            // --- HAPUS OUTLINEDBUTTON 'KEMBALI' DARI SINI ---
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: OutlinedButton(
+            //     onPressed: () {
+            //       Navigator.pushReplacement(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => const GoalSelectionScreen()),
+            //       );
+            //     },
+            //     child: const Text('KEMBALI'),
+            //   ),
+            // ),
+            // --- AKHIR HAPUS ---
           ],
         ),
       ),
+      // --- TAMBAHKAN FLOATINGACTIONBUTTON INI ---
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Navigasi kembali ke GoalSelectionScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const GoalSelectionScreen()),
+          );
+        },
+        mini: true, // Membuat FAB lebih kecil
+        backgroundColor: Colors.transparent, // Background transparan
+        elevation: 0, // Tanpa bayangan
+        child: Icon(
+          Icons.arrow_back_ios,
+          color: Theme.of(context).primaryColor, // Warna ikon sesuai tema utama
+          size: 24,
+        ),
+      ),
+      // --- AKHIR TAMBAHAN FLOATINGACTIONBUTTON ---
     );
   }
 }

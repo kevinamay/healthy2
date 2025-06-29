@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Untuk mendapatkan UID pengguna
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hitung/screens/login_screen.dart';
-import 'package:hitung/screens/next_page_after_goal.dart'; // Akan kita buat di langkah selanjutnya
+import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah semua cabang
+
+// --- TAMBAHKAN IMPORT INI ---
+import 'package:hitung/screens/sub_goals/weight_loss_obstacle_screen.dart';
+import 'package:hitung/screens/sub_goals/metabolism_improvement_screen.dart';
+import 'package:hitung/screens/sub_goals/energy_level_screen.dart';
+import 'package:hitung/screens/sub_goals/anti_aging_aspect_screen.dart';
+import 'package:hitung/screens/sub_goals/weight_maintenance_challenge_screen.dart';
+import 'package:hitung/screens/sub_goals/mental_health_aspect_screen.dart';
+// --- AKHIR TAMBAHAN IMPORT ---
+
 
 class GoalSelectionScreen extends StatefulWidget {
   const GoalSelectionScreen({Key? key}) : super(key: key);
@@ -18,94 +28,131 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Daftar tujuan kesehatan
+  // --- GANTI BAGIAN _goals INI ---
   final List<Map<String, dynamic>> _goals = [
     {
       'title': 'Menurunkan berat badan',
       'subtitle': 'Turunkan berat badan dengan cara sehat',
-      'icon': Icons.scale, // Ikon timbangan
+      'icon': Icons.scale,
       'iconColor': Colors.pink.shade300,
+      'valueToSave': 'Menurunkan berat badan',
+      'nextPage': const WeightLossObstacleScreen(), // <-- DITAMBAHKAN
     },
     {
       'title': 'Meningkatkan kesehatan metabolisme',
       'subtitle': 'Optimalkan metabolisme tubuh Anda',
-      'icon': Icons.cached, // Ikon refresh/putar
+      'icon': Icons.cached,
       'iconColor': Colors.orange.shade300,
+      'valueToSave': 'Meningkatkan kesehatan metabolisme',
+      'nextPage': const MetabolismImprovementScreen(), // <-- DITAMBAHKAN
     },
     {
       'title': 'Dapatkan energi',
       'subtitle': 'Tingkatkan stamina dan kekuatan Anda',
-      'icon': Icons.flash_on, // Ikon petir
+      'icon': Icons.flash_on,
       'iconColor': Colors.amber.shade300,
+      'valueToSave': 'Dapatkan energi',
+      'nextPage': const EnergyLevelScreen(), // <-- DITAMBAHKAN
     },
     {
       'title': 'Anti-penuaan dan umur panjang',
       'subtitle': 'Jaga kesehatan dan vitalitas jangka panjang',
-      'icon': Icons.star_border, // Ikon bintang (opsional, sesuaikan)
+      'icon': Icons.star_border,
       'iconColor': Colors.lightGreen.shade300,
+      'valueToSave': 'Anti-penuaan dan umur panjang',
+      'nextPage': const AntiAgingAspectScreen(), // <-- DITAMBAHKAN
     },
     {
       'title': 'Mempertahankan berat badan',
       'subtitle': 'Jaga berat badan ideal Anda',
-      'icon': Icons.loop, // Ikon loop
+      'icon': Icons.loop,
       'iconColor': Colors.blue.shade300,
+      'valueToSave': 'Mempertahankan berat badan',
+      'nextPage': const WeightMaintenanceChallengeScreen(), // <-- DITAMBAHKAN
     },
     {
       'title': 'Meningkatkan kesehatan mental',
       'subtitle': 'Fokus pada kesejahteraan pikiran',
-      'icon': Icons.lightbulb_outline, // Ikon bohlam (opsional, sesuaikan)
+      'icon': Icons.lightbulb_outline,
       'iconColor': Colors.deepPurple.shade300,
+      'valueToSave': 'Meningkatkan kesehatan mental',
+      'nextPage': const MentalHealthAspectScreen(), // <-- DITAMBAHKAN
     },
   ];
+  // --- AKHIR GANTI BAGIAN _goals ---
 
   Future<void> _saveGoalAndNavigate() async {
-  print('DEBUG: _saveGoalAndNavigate called.');
-  User? user = _auth.currentUser;
-  print('DEBUG: Current User UID: ${user?.uid}');
+    print('DEBUG: GoalSelectionScreen - _saveGoalAndNavigate called.');
 
-  if (_selectedGoal == null) {
-    print('DEBUG: No goal selected.');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Silakan pilih salah satu tujuan Anda.')),
-    );
-    return;
-  }
+    if (_selectedGoal == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Silakan pilih salah satu tujuan Anda.')),
+      );
+      print('DEBUG: GoalSelectionScreen - No goal selected.');
+      return;
+    }
 
-  if (user == null) {
-    print('DEBUG: User is null, redirecting to login.');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Pengguna tidak ditemukan. Harap login kembali.')),
-    );
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => LoginScreen()));
-    return;
-  }
+    User? user = _auth.currentUser;
+    print('DEBUG: GoalSelectionScreen - Current User UID: ${user?.uid}');
 
-  print('DEBUG: Attempting to save goal: $_selectedGoal for UID: ${user.uid}');
-  try {
-    await _database.child('users').child(user.uid).update({
-      'healthGoal': _selectedGoal,
-      'goalSelectionTimestamp': ServerValue.timestamp,
-    });
-    print('DEBUG: Goal saved successfully!'); // <-- Ini harus muncul di konsol jika berhasil
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Tujuan Anda berhasil disimpan!')),
-    );
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const NextPageAfterGoal()),
-    );
-  } on FirebaseException catch (e) { // <-- Tangkap FirebaseException spesifik
-    print('DEBUG: Firebase Exception: ${e.code} - ${e.message}');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Gagal menyimpan tujuan (Firebase): ${e.message}')),
-    );
-  } catch (e) {
-    print('DEBUG: General Error saving goal: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Gagal menyimpan tujuan: ${e.toString()}')),
-    );
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pengguna tidak ditemukan. Harap login kembali.')),
+      );
+      print('DEBUG: GoalSelectionScreen - User is null, redirecting to login.');
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      return;
+    }
+
+    try {
+      print('DEBUG: GoalSelectionScreen - Attempting to save healthGoal: $_selectedGoal for UID: ${user.uid}');
+      await _database.child('users').child(user.uid).update({
+        'healthGoal': _selectedGoal,
+        'goalSelectionTimestamp': ServerValue.timestamp,
+      });
+      print('DEBUG: GoalSelectionScreen - Data saved successfully for healthGoal!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tujuan Anda berhasil disimpan!')),
+      );
+
+      // --- TAMBAHKAN LOGIKA NAVIGASI KONDISIONAL INI ---
+      Widget? nextPageWidget;
+      for (var goal in _goals) {
+        if (goal['valueToSave'] == _selectedGoal) {
+          nextPageWidget = goal['nextPage'] as Widget?;
+          break;
+        }
+      }
+
+      if (nextPageWidget != null) {
+        print('DEBUG: GoalSelectionScreen - Navigating to ${nextPageWidget.runtimeType}');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => nextPageWidget!),
+        );
+      } else {
+        // Fallback jika nextPageWidget tidak ditemukan (harusnya tidak terjadi jika logika benar)
+        print('DEBUG: GoalSelectionScreen - No specific next page found. Navigating to default.');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const NextPageAfterGoal()),
+        );
+      }
+      // --- AKHIR TAMBAHAN LOGIKA NAVIGASI KONDISIONAL ---
+
+    } on FirebaseException catch (e) {
+      print('DEBUG: GoalSelectionScreen - Firebase Exception: ${e.code} - ${e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menyimpan tujuan (Firebase): ${e.message}')),
+      );
+    } catch (e) {
+      print('DEBUG: GoalSelectionScreen - General Error saving goal: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menyimpan tujuan: ${e.toString()}')),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +160,6 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
       appBar: AppBar(
         title: const Text('Apa tujuan Anda?'),
         centerTitle: true,
-        // Tombol back dihapus karena ini setelah login
         automaticallyImplyLeading: false,
       ),
       body: Padding(
@@ -140,9 +186,9 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: _selectedGoal == goal['title']
-                            ? Theme.of(context).primaryColor // Warna border saat terpilih
-                            : Colors.transparent, // Transparan saat tidak terpilih
+                        color: _selectedGoal == goal['valueToSave']
+                            ? Theme.of(context).primaryColor
+                            : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -150,7 +196,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
                         setState(() {
-                          _selectedGoal = goal['title']; // Set tujuan yang dipilih
+                          _selectedGoal = goal['valueToSave'];
                         });
                       },
                       child: Padding(
@@ -160,13 +206,13 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: goal['iconColor'].withOpacity(0.2), // Warna background ikon
+                                color: (goal['iconColor'] as Color).withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                goal['icon'],
+                                goal['icon'] as IconData,
                                 size: 30,
-                                color: goal['iconColor'], // Warna ikon
+                                color: goal['iconColor'] as Color,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -175,7 +221,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    goal['title'],
+                                    goal['title'] as String,
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -184,7 +230,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    goal['subtitle'],
+                                    goal['subtitle'] as String,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey[600],
@@ -193,10 +239,10 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
                                 ],
                               ),
                             ),
-                            if (_selectedGoal == goal['title'])
+                            if (_selectedGoal == goal['valueToSave'])
                               Icon(
                                 Icons.check_circle,
-                                color: Theme.of(context).primaryColor, // Ikon centang saat terpilih
+                                color: Theme.of(context).primaryColor,
                                 size: 24,
                               ),
                           ],
@@ -211,7 +257,7 @@ class _GoalSelectionScreenState extends State<GoalSelectionScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _saveGoalAndNavigate, // Panggil fungsi untuk menyimpan dan navigasi
+                onPressed: _saveGoalAndNavigate,
                 child: const Text('BERIKUTNYA'),
               ),
             ),

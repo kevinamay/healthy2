@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hitung/screens/sub_goals/base_question_screen.dart'; // Menggunakan BaseQuestionScreen
 import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah ini
+import 'package:hitung/screens/eating_habit_screen.dart';
 
 class HealthConditionScreen extends StatelessWidget {
   const HealthConditionScreen({Key? key}) : super(key: key);
@@ -11,7 +12,7 @@ class HealthConditionScreen extends StatelessWidget {
       title: 'Apakah Anda memiliki kondisi kesehatan berikut?',
       subtitle: 'Pilih yang paling sesuai dengan Anda',
       dbKey: 'healthCondition', // Key untuk menyimpan di Firebase
-      nextScreen: const NextPageAfterGoal(), // Ganti dengan halaman final yang sebenarnya nanti
+      nextScreen: const EatingHabitScreen(), // Ganti dengan halaman final yang sebenarnya nanti
       screenDescription: 'HealthConditionScreen', // Deskripsi untuk debugging
       options: [
         {

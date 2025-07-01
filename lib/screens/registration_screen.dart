@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart'; // Tetap dibutuhkan untuk data profil tambahan
-import 'package:firebase_auth/firebase_auth.dart'; // <-- Import Firebase Auth
+// import 'package:firebase_database/firebase_database.dart'; // <-- Hapus atau komen ini jika tidak digunakan lagi di sini
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // <-- Import Cloud Firestore
 import 'package:hitung/screens/login_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -26,9 +27,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  // Inisialisasi instance Firebase Auth dan Realtime Database
-  final FirebaseAuth _auth = FirebaseAuth.instance; // <-- Tambahkan ini
-  final DatabaseReference _database = FirebaseDatabase.instance.ref();
+  // Inisialisasi instance Firebase Auth dan Cloud Firestore
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final DatabaseReference _database = FirebaseDatabase.instance.ref(); // <-- Hapus atau komen ini
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // <-- Tambahkan ini
 
   Future<void> _registerUser() async {
     if (_formKey.currentState!.validate()) {
@@ -74,17 +76,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         String? uid = userCredential.user?.uid;
 
         if (uid != null) {
-          // 2. SIMPAN DATA PROFIL TAMBAHAN KE REALTIME DATABASE MENGGUNAKAN UID SEBAGAI KUNCI
-          await _database.child('users').child(uid).set({ // Menggunakan UID sebagai kunci unik
+          // 2. SIMPAN DATA PROFIL TAMBAHAN KE CLOUD FIRESTORE MENGGUNAKAN UID SEBAGAI DOKUMEN ID
+          await _firestore.collection('users').doc(uid).set({ // <-- GANTI KE FIRESTORE
             'email': email,
-            // 'password': password, // JANGAN simpan password di Realtime Database!
+            // 'password': password, // JANGAN simpan password di database!
             'fullName': fullName,
             'age': age,
             'gender': gender,
-            'weight': weight,
+            'weight': weight, // Ini akan menjadi berat badan awal
             'height': height,
             'targetWeight': targetWeight,
-            'timestamp': ServerValue.timestamp,
+            'registrationTimestamp': FieldValue.serverTimestamp(), // Firestore punya FieldValue.serverTimestamp()
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -123,7 +125,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     }
   }
 
-  // ... sisa widget build() tetap sama ...
   @override
   Widget build(BuildContext context) {
     return Scaffold(

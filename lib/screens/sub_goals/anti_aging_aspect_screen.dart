@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hitung/screens/sub_goals/base_question_screen.dart';
-import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah ini
+import 'package:hitung/screens/health_condition_screen.dart'; // <-- Import ini ditambahkan
 
 class AntiAgingAspectScreen extends StatelessWidget {
   const AntiAgingAspectScreen({Key? key}) : super(key: key);
@@ -11,36 +11,43 @@ class AntiAgingAspectScreen extends StatelessWidget {
       title: 'Aspek anti-penuaan mana yang paling Anda prioritaskan?',
       subtitle: 'Pilih fokus utama Anda untuk umur panjang',
       dbKey: 'antiAgingAspect', // Key di Firebase
-      nextScreen: const NextPageAfterGoal(),
+      nextScreen: const HealthConditionScreen(), // <-- Ini diubah
       screenDescription: 'AntiAgingAspectScreen',
       options: [
         {
-          'title': 'Kesehatan kulit dan penampilan',
-          'subtitle': 'Menjaga kulit tetap sehat dan awet muda',
+          'title': 'Kesehatan kulit',
+          'subtitle': 'Mengurangi kerutan dan meningkatkan elastisitas kulit',
           'icon': Icons.spa,
-          'iconColor': Colors.pink.shade300,
-          'valueToSave': 'Kesehatan kulit dan penampilan',
+          'iconColor': Colors.pink.shade200,
+          'valueToSave': 'Kesehatan kulit',
         },
         {
-          'title': 'Fungsi kognitif',
-          'subtitle': 'Menjaga ketajaman pikiran dan memori',
+          'title': 'Kesehatan otak',
+          'subtitle': 'Menjaga fungsi kognitif dan mencegah penurunan memori',
           'icon': Icons.lightbulb_outline,
-          'iconColor': Colors.yellow.shade700,
-          'valueToSave': 'Fungsi kognitif',
+          'iconColor': Colors.blue.shade200,
+          'valueToSave': 'Kesehatan otak',
         },
         {
-          'title': 'Kesehatan seluler',
-          'subtitle': 'Memperlambat penuaan di tingkat sel',
-          'icon': Icons.science,
-          'iconColor': Colors.green.shade300,
-          'valueToSave': 'Kesehatan seluler',
+          'title': 'Kesehatan sendi dan tulang',
+          'subtitle': 'Mempertahankan mobilitas dan kekuatan tulang',
+          'icon': Icons.accessibility_new,
+          'iconColor': Colors.green.shade200,
+          'valueToSave': 'Kesehatan sendi dan tulang',
         },
         {
-          'title': 'Mobilitas dan fleksibilitas',
-          'subtitle': 'Menjaga kemampuan bergerak dengan baik',
-          'icon': Icons.directions_run,
-          'iconColor': Colors.blue.shade300,
-          'valueToSave': 'Mobilitas dan fleksibilitas',
+          'title': 'Kesehatan jantung',
+          'subtitle': 'Menjaga sistem kardiovaskular yang kuat',
+          'icon': Icons.favorite,
+          'iconColor': Colors.red.shade200,
+          'valueToSave': 'Kesehatan jantung',
+        },
+        {
+          'title': 'Tingkat energi',
+          'subtitle': 'Mempertahankan vitalitas dan stamina',
+          'icon': Icons.flash_on,
+          'iconColor': Colors.amber.shade200,
+          'valueToSave': 'Tingkat energi',
         },
       ],
     );

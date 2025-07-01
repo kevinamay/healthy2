@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hitung/screens/sub_goals/base_question_screen.dart';
-import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah ini
+import 'package:hitung/screens/health_condition_screen.dart'; // <-- Import ini ditambahkan
 
 class MetabolismImprovementScreen extends StatelessWidget {
   const MetabolismImprovementScreen({Key? key}) : super(key: key);
@@ -11,36 +11,43 @@ class MetabolismImprovementScreen extends StatelessWidget {
       title: 'Bagaimana pola makan Anda saat ini?',
       subtitle: 'Pilih yang paling menggambarkan kebiasaan Anda',
       dbKey: 'currentDietPattern', // Key di Firebase
-      nextScreen: const NextPageAfterGoal(),
+      nextScreen: const HealthConditionScreen(), // <-- Ini diubah
       screenDescription: 'MetabolismImprovementScreen',
       options: [
         {
-          'title': 'Jadwal makan tidak teratur',
-          'subtitle': 'Sering melewatkan waktu makan atau makan larut malam',
-          'icon': Icons.access_time,
-          'iconColor': Colors.orange,
-          'valueToSave': 'Jadwal makan tidak teratur',
+          'title': 'Tinggi karbohidrat olahan',
+          'subtitle': 'Banyak roti putih, pasta, dan makanan manis',
+          'icon': Icons.bakery_dining,
+          'iconColor': Colors.brown,
+          'valueToSave': 'Tinggi karbohidrat olahan',
         },
         {
-          'title': 'Banyak makanan olahan',
-          'subtitle': 'Sering mengonsumsi makanan cepat saji atau kemasan',
-          'icon': Icons.warning_amber,
+          'title': 'Tinggi lemak tidak sehat',
+          'subtitle': 'Sering konsumsi gorengan dan makanan cepat saji',
+          'icon': Icons.fastfood,
           'iconColor': Colors.red,
-          'valueToSave': 'Banyak makanan olahan',
+          'valueToSave': 'Tinggi lemak tidak sehat',
         },
         {
-          'title': 'Cukup seimbang',
-          'subtitle': 'Berusaha makan teratur dengan makanan sehat',
-          'icon': Icons.check_circle,
+          'title': 'Seimbang dan bervariasi',
+          'subtitle': 'Mengandung protein, karbohidrat kompleks, dan serat',
+          'icon': Icons.restaurant_menu,
           'iconColor': Colors.green,
-          'valueToSave': 'Cukup seimbang',
+          'valueToSave': 'Seimbang dan bervariasi',
         },
         {
-          'title': 'Pola makan terbatas',
-          'subtitle': 'Sering diet ketat atau puasa',
-          'icon': Icons.block,
-          'iconColor': Colors.blue,
-          'valueToSave': 'Pola makan terbatas',
+          'title': 'Vegetarian/Vegan',
+          'subtitle': 'Berbasis tumbuhan, tanpa produk hewani',
+          'icon': Icons.eco,
+          'iconColor': Colors.lightGreen,
+          'valueToSave': 'Vegetarian/Vegan',
+        },
+        {
+          'title': 'Tidak teratur',
+          'subtitle': 'Sering melewatkan makan atau makan tidak tepat waktu',
+          'icon': Icons.schedule,
+          'iconColor': Colors.grey,
+          'valueToSave': 'Tidak teratur',
         },
       ],
     );

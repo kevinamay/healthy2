@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hitung/screens/sub_goals/base_question_screen.dart';
-import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah ini
+import 'package:hitung/screens/health_condition_screen.dart'; // <-- Import ini ditambahkan
 
 class WeightMaintenanceChallengeScreen extends StatelessWidget {
   const WeightMaintenanceChallengeScreen({Key? key}) : super(key: key);
@@ -11,36 +11,43 @@ class WeightMaintenanceChallengeScreen extends StatelessWidget {
       title: 'Apa tantangan terbesar dalam mempertahankan berat badan Anda?',
       subtitle: 'Pilih yang paling sesuai dengan situasi Anda',
       dbKey: 'weightMaintenanceChallenge', // Key di Firebase
-      nextScreen: const NextPageAfterGoal(),
+      nextScreen: const HealthConditionScreen(), // <-- Ini diubah
       screenDescription: 'WeightMaintenanceChallengeScreen',
       options: [
         {
-          'title': 'Fluktuasi berat badan',
-          'subtitle': 'Berat badan naik turun secara signifikan',
-          'icon': Icons.auto_graph,
-          'iconColor': Colors.blue.shade300,
-          'valueToSave': 'Fluktuasi berat badan',
+          'title': 'Godaan makanan',
+          'subtitle': 'Sulit menahan diri dari makanan tidak sehat',
+          'icon': Icons.cake,
+          'iconColor': Colors.pink.shade300,
+          'valueToSave': 'Godaan makanan',
         },
         {
-          'title': 'Konsistensi kebiasaan',
-          'subtitle': 'Sulit mempertahankan pola makan dan olahraga',
-          'icon': Icons.check_circle_outline,
+          'title': 'Kurangnya aktivitas fisik',
+          'subtitle': 'Jarang berolahraga atau bergerak aktif',
+          'icon': Icons.directions_run,
           'iconColor': Colors.green.shade300,
-          'valueToSave': 'Konsistensi kebiasaan',
+          'valueToSave': 'Kurangnya aktivitas fisik',
         },
         {
-          'title': 'Acara sosial dan liburan',
-          'subtitle': 'Sulit menjaga pola makan saat acara khusus',
-          'icon': Icons.calendar_today,
-          'iconColor': Colors.amber.shade300,
-          'valueToSave': 'Acara sosial dan liburan',
+          'title': 'Perubahan gaya hidup',
+          'subtitle': 'Perjalanan, pekerjaan baru, atau perubahan rutin',
+          'icon': Icons.work,
+          'iconColor': Colors.blueGrey.shade300,
+          'valueToSave': 'Perubahan gaya hidup',
         },
         {
-          'title': 'Perubahan metabolisme',
-          'subtitle': 'Metabolisme melambat seiring bertambahnya usia',
-          'icon': Icons.cached,
-          'iconColor': Colors.orange.shade300,
-          'valueToSave': 'Perubahan metabolisme',
+          'title': 'Fluktuasi hormonal',
+          'subtitle': 'Perubahan berat badan karena hormon',
+          'icon': Icons.science,
+          'iconColor': Colors.purple.shade300,
+          'valueToSave': 'Fluktuasi hormonal',
+        },
+        {
+          'title': 'Lingkungan sosial',
+          'subtitle': 'Tekanan dari teman/keluarga untuk makan berlebihan',
+          'icon': Icons.people,
+          'iconColor': Colors.teal.shade300,
+          'valueToSave': 'Lingkungan sosial',
         },
       ],
     );

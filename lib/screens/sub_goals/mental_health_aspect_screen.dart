@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hitung/screens/sub_goals/base_question_screen.dart';
-import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah ini
+import 'package:hitung/screens/health_condition_screen.dart'; // <-- Import ini ditambahkan
 
 class MentalHealthAspectScreen extends StatelessWidget {
   const MentalHealthAspectScreen({Key? key}) : super(key: key);
@@ -11,36 +11,43 @@ class MentalHealthAspectScreen extends StatelessWidget {
       title: 'Aspek kesehatan mental apa yang ingin Anda tingkatkan?',
       subtitle: 'Pilih area yang paling penting bagi Anda',
       dbKey: 'mentalHealthAspect', // Key di Firebase
-      nextScreen: const NextPageAfterGoal(),
+      nextScreen: const HealthConditionScreen(), // <-- Ini diubah
       screenDescription: 'MentalHealthAspectScreen',
       options: [
         {
-          'title': 'Manajemen stres',
-          'subtitle': 'Mengurangi dan mengelola stres sehari-hari',
-          'icon': Icons.home,
-          'iconColor': Colors.deepOrange.shade300,
-          'valueToSave': 'Manajemen stres',
+          'title': 'Mengurangi stres dan kecemasan',
+          'subtitle': 'Mencari ketenangan dan keseimbangan emosional',
+          'icon': Icons.self_improvement,
+          'iconColor': Colors.purple.shade200,
+          'valueToSave': 'Mengurangi stres dan kecemasan',
         },
         {
-          'title': 'Kualitas tidur',
-          'subtitle': 'Meningkatkan tidur untuk kesehatan mental',
-          'icon': Icons.nights_stay,
-          'iconColor': Colors.blue.shade300,
-          'valueToSave': 'Kualitas tidur',
+          'title': 'Meningkatkan kualitas tidur',
+          'subtitle': 'Mendapatkan istirahat yang cukup dan berkualitas',
+          'icon': Icons.bedtime,
+          'iconColor': Colors.deepPurple.shade200,
+          'valueToSave': 'Meningkatkan kualitas tidur',
         },
         {
-          'title': 'Fokus dan konsentrasi',
-          'subtitle': 'Meningkatkan kemampuan fokus dan produktivitas',
-          'icon': Icons.search,
-          'iconColor': Colors.cyan.shade300,
-          'valueToSave': 'Fokus dan konsentrasi',
+          'title': 'Meningkatkan fokus dan konsentrasi',
+          'subtitle': 'Mempertajam pikiran dan produktivitas',
+          'icon': Icons.lightbulb,
+          'iconColor': Colors.blue.shade200,
+          'valueToSave': 'Meningkatkan fokus dan konsentrasi',
         },
         {
-          'title': 'Stabilitas suasana hati',
-          'subtitle': 'Mengurangi fluktuasi mood dan meningkatkan kebahagiaan',
-          'icon': Icons.tag_faces,
-          'iconColor': Colors.green.shade300,
-          'valueToSave': 'Stabilitas suasana hati',
+          'title': 'Meningkatkan mood dan kebahagiaan',
+          'subtitle': 'Merasa lebih positif dan bersemangat',
+          'icon': Icons.sentiment_satisfied_alt,
+          'iconColor': Colors.green.shade200,
+          'valueToSave': 'Meningkatkan mood dan kebahagiaan',
+        },
+        {
+          'title': 'Mengelola emosi',
+          'subtitle': 'Mengembangkan resiliensi emosional',
+          'icon': Icons.psychology,
+          'iconColor': Colors.orange.shade200,
+          'valueToSave': 'Mengelola emosi',
         },
       ],
     );

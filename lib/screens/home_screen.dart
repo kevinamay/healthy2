@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hitung/screens/goal_selection_screen.dart'; // Import halaman tujuan
 
@@ -12,13 +13,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    print('User after login in HomeScreen: ${currentUser?.uid}');
     // Setelah 2 detik, navigasi ke GoalSelectionScreen
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        // --- GANTI BAGIAN INI ---
-        MaterialPageRoute(builder: (context) => GoalSelectionScreen()), // Hapus 'const' di sini
-        // --- AKHIR GANTI BAGIAN INI ---
+        // Ini sudah benar tanpa 'const' di MaterialPageRoute dan GoalSelectionScreen() karena ia Stateful
+        MaterialPageRoute(builder: (context) => GoalSelectionScreen()),
       );
     });
   }

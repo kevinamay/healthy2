@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hitung/screens/sub_goals/base_question_screen.dart';
-import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah ini
+import 'package:hitung/screens/health_condition_screen.dart'; // <-- Import ini ditambahkan
 
 class EnergyLevelScreen extends StatelessWidget {
   const EnergyLevelScreen({Key? key}) : super(key: key);
@@ -11,7 +11,7 @@ class EnergyLevelScreen extends StatelessWidget {
       title: 'Kapan Anda merasa paling kekurangan energi?',
       subtitle: 'Pilih waktu yang paling sering Anda merasa lelah',
       dbKey: 'energyDeficiencyTime', // Key di Firebase
-      nextScreen: const NextPageAfterGoal(),
+      nextScreen: const HealthConditionScreen(), // <-- Ini diubah
       screenDescription: 'EnergyLevelScreen',
       options: [
         {

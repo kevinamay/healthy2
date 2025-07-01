@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hitung/screens/sub_goals/base_question_screen.dart'; // Menggunakan BaseQuestionScreen
 import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah ini
+import 'package:hitung/screens/diet_screen.dart';
 
 class HungerTimeScreen extends StatelessWidget {
   const HungerTimeScreen({Key? key}) : super(key: key);
@@ -11,7 +12,7 @@ class HungerTimeScreen extends StatelessWidget {
       title: 'Kapan Anda merasa paling lapar dalam sehari?',
       subtitle: 'Pilih waktu di mana Anda paling sering merasakan lapar yang signifikan.',
       dbKey: 'hungerTime', // Key untuk menyimpan di Firebase Realtime Database
-      nextScreen: const NextPageAfterGoal(), // Ganti dengan halaman final yang sebenarnya nanti
+      nextScreen: const DietScreen(), // Ganti dengan halaman final yang sebenarnya nanti
       screenDescription: 'HungerTimeScreen', // Deskripsi untuk debugging
       options: [
         {

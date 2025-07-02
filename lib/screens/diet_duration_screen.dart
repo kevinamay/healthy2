@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
+// lib/screens/diet_duration_screen.dart
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hitung/screens/login_screen.dart'; // Untuk navigasi fallback
-import 'package:hitung/screens/next_page_after_goal.dart'; // Halaman final setelah ini
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:hitung/screens/login_screen.dart';
+import 'package:hitung/screens/sub_goals/base_question_screen.dart';
+import 'package:hitung/screens/personalized_plan_screen.dart'; // <-- Import halaman baru ini
 import 'package:hitung/screens/diet_screen.dart'; // Untuk tombol kembali
 
 class DietDurationScreen extends StatefulWidget {
@@ -13,12 +15,11 @@ class DietDurationScreen extends StatefulWidget {
 }
 
 class _DietDurationScreenState extends State<DietDurationScreen> {
-  String? _selectedDuration; // Durasi yang dipilih (misal: "1 Minggu", "2 Minggu", "1 Bulan")
+  String? _selectedDuration;
 
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Data untuk setiap opsi durasi diet
   final List<Map<String, dynamic>> _durationOptions = [
     {
       'id': '1_minggu',
@@ -29,7 +30,8 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
       'icon': Icons.checklist_rtl,
       'iconColor': Colors.green.shade600,
       'description': 'Fokus pada pengenalan makanan sehat dan pengurangan gula. Tidak terlalu ketat, cocok untuk adaptasi awal.',
-      'difficulty': 1, // Bintang kesulitan: 1 = Rendah
+      'difficulty': 1,
+      'durationWeeks': 1, // Tambahkan ini untuk perhitungan
     },
     {
       'id': '2_minggu',
@@ -40,7 +42,8 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
       'icon': Icons.calendar_today,
       'iconColor': Colors.blue.shade600,
       'description': 'Tahap penyesuaian tubuh dengan porsi terkontrol dan peningkatan aktivitas fisik. Siap untuk tantangan lebih?',
-      'difficulty': 2, // Bintang kesulitan: 2 = Sedang
+      'difficulty': 2,
+      'durationWeeks': 2, // Tambahkan ini untuk perhitungan
     },
     {
       'id': '1_bulan',
@@ -51,25 +54,24 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
       'icon': Icons.watch_later,
       'iconColor': Colors.orange.shade600,
       'description': 'Membentuk kebiasaan hidup sehat secara permanen. Fokus pada disiplin dan konsistensi. Capai tujuan jangka panjang Anda!',
-      'difficulty': 3, // Bintang kesulitan: 3 = Tinggi
+      'difficulty': 3,
+      'durationWeeks': 4, // Tambahkan ini untuk perhitungan (1 bulan = 4 minggu)
     },
   ];
 
-  // Fungsi untuk membangun bintang kesulitan
   Widget _buildDifficultyStars(int difficulty) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(3, (index) {
         return Icon(
           index < difficulty ? Icons.star : Icons.star_border,
-          color: Colors.amber, // Warna bintang
+          color: Colors.amber,
           size: 18,
         );
       }),
     );
   }
 
-  // Fungsi untuk menyimpan durasi yang dipilih dan navigasi
   Future<void> _saveDurationAndNavigate(String durationValue) async {
     print('DEBUG: DietDurationScreen - _saveDurationAndNavigate called for: $durationValue');
 
@@ -91,8 +93,19 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
 
     try {
       print('DEBUG: DietDurationScreen - Attempting to save dietDuration: $durationValue for UID: ${user.uid}');
+
+      // Dapatkan jumlah minggu dari opsi yang dipilih
+      int? durationInWeeks;
+      for(var option in _durationOptions) {
+        if (option['id'] == _selectedDuration) {
+          durationInWeeks = option['durationWeeks'] as int?;
+          break;
+        }
+      }
+
       await _database.child('users').child(user.uid).update({
         'dietDuration': durationValue,
+        'dietDurationInWeeks': durationInWeeks, // <-- Simpan durasi dalam minggu
         'dietDurationTimestamp': ServerValue.timestamp,
       });
       print('DEBUG: DietDurationScreen - Diet duration saved successfully!');
@@ -100,10 +113,10 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
         const SnackBar(content: Text('Durasi diet Anda berhasil disimpan!')),
       );
 
-      // Navigasi ke halaman selanjutnya setelah berhasil menyimpan
+      // Navigasi ke halaman PersonalizedPlanScreen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const NextPageAfterGoal()), // Halaman final
+        MaterialPageRoute(builder: (context) => const PersonalizedPlanScreen()), // <-- GANTI KE SINI
       );
     } on FirebaseException catch (e) {
       print('DEBUG: DietDurationScreen - Firebase Exception: ${e.code} - ${e.message}');
@@ -118,7 +131,6 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
     }
   }
 
-  // Fungsi Logout (diulang)
   Future<void> _logout() async {
     try {
       await _auth.signOut();
@@ -142,12 +154,11 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pilih Durasi Diet'), // Judul AppBar
+        title: const Text('Pilih Durasi Diet'),
         centerTitle: true,
-        leading: IconButton( // Tombol back AppBar
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Kembali ke DietScreen
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const DietScreen()),
@@ -180,7 +191,7 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
                 itemCount: _durationOptions.length,
                 itemBuilder: (context, index) {
                   final option = _durationOptions[index];
-                  bool isSelected = _selectedDuration == option['id']; // Cek apakah opsi ini terpilih
+                  bool isSelected = _selectedDuration == option['id'];
 
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
@@ -189,8 +200,8 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
                         color: isSelected
-                            ? Theme.of(context).primaryColor // Warna border saat terpilih
-                            : Colors.transparent, // Transparan saat tidak terpilih
+                            ? Theme.of(context).primaryColor
+                            : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -198,7 +209,7 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
                         setState(() {
-                          _selectedDuration = option['id']; // Perbarui pilihan saat kartu diklik
+                          _selectedDuration = option['id'];
                         });
                       },
                       child: Padding(
@@ -209,7 +220,7 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row( // Icon dan Judul Durasi
+                                Row(
                                   children: [
                                     Icon(option['icon'] as IconData, size: 30, color: option['iconColor'] as Color),
                                     const SizedBox(width: 12),
@@ -235,7 +246,6 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
                                     ),
                                   ],
                                 ),
-                                // Tag Pemula/Menengah/Lanjutan
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
@@ -254,7 +264,6 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
                               ],
                             ),
                             const SizedBox(height: 16),
-                            // Deskripsi
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -269,27 +278,25 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            // Tingkat Kesulitan
                             Row(
                               children: [
-                                Icon(Icons.star, size: 20, color: Colors.amber), // Ikon bintang utama
+                                Icon(Icons.star, size: 20, color: Colors.amber),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Tingkat kesulitan: ',
                                   style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                                 ),
                                 _buildDifficultyStars(option['difficulty'] as int),
-                                const Spacer(), // Dorong tombol "Pilih" ke kanan
-                                // Tombol "Pilih"
-                                if (isSelected) // Hanya tampilkan tombol "Pilih" jika kartu ini yang terpilih
+                                const Spacer(),
+                                if (isSelected)
                                   SizedBox(
                                     height: 35,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        _saveDurationAndNavigate(option['valueToSave'] ?? option['id'] as String);
+                                        _saveDurationAndNavigate(option['id'] as String); // Menggunakan 'id' sebagai valueToSave
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green, // Warna hijau
+                                        backgroundColor: Colors.green,
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                         padding: const EdgeInsets.symmetric(horizontal: 16),
                                       ),
@@ -306,8 +313,6 @@ class _DietDurationScreenState extends State<DietDurationScreen> {
                 },
               ),
             ),
-            // Tidak ada tombol 'BERIKUTNYA' umum di bawah, karena 'Pilih' di dalam kartu sudah menavigasi.
-            // Namun, jika Anda ingin, Anda bisa tambahkan kembali dan sesuaikan logikanya.
           ],
         ),
       ),
